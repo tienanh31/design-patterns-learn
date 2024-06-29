@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 
 interface Question {
   question: string;
@@ -10,42 +9,57 @@ interface Question {
 
 const questions: Question[] = [
   {
-    question: "A design pattern that allows you to add new operations to the program without changing the classes of objects on which these operations can be performed.",
-    pattern: "Visitor",
+    question: "A design pattern that composes objects into tree structures to represent part-whole hierarchies. It lets clients treat individual objects and compositions of objects uniformly.",
+    pattern: "Composite",
+    category: "Structural patterns"
+  },
+  {
+    question: "A design pattern that defines a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.",
+    pattern: "Observer",
     category: "Behavioral patterns"
   },
   {
-    question: "A design pattern that ensures a class has only one instance and provides a global point of access to it.",
-    pattern: "Singleton",
-    category: "Creational patterns"
+    question: "A design pattern that reduces communication and dependencies between objects to a mediator object.",
+    pattern: "Mediator",
+    category: "Behavioral patterns"
   },
+  {
+    question: "A design pattern that allows objects to be composed into a tree structure to represent part-whole hierarchies. It lets clients treat individual objects and compositions of objects uniformly.",
+    pattern: "Composite",
+    category: "Structural patterns"
+  },
+  {
+    question: "A design pattern that simplifies the creation of complex objects by providing a way to construct them step-by-step.",
+    pattern: "Builder",
+    category: "Creational patterns"
+  }
   // Add more questions as needed
 ];
 
-const mainCategories = {
-  "Behavioral patterns": ["Visitor", "Observer", "Strategy", "Mediator"],
-  "Creational patterns": ["Singleton", "Factory Method", "Abstract Factory", "Builder"],
-  "Structural patterns": ["Adapter", "Decorator", "Facade", "Proxy"]
-};
-
 const QuestionScreen = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const question = questions[currentQuestionIndex];
 
+  const handleAnswerPress = (answer: string) => {
+    setSelectedAnswer(answer);
+    setIsChecked(false);
+  };
+
   const handleCheckPress = () => {
-    if (selectedMainCategory === null || selectedSubCategory === null) {
-      Alert.alert('Please select both main category and subcategory before checking.');
+    if (selectedAnswer === null) {
+      Alert.alert('Please select an answer before checking.');
       return;
     }
     setIsChecked(true);
-    if (selectedMainCategory === question.category && selectedSubCategory === question.pattern) {
-      Alert.alert('Correct', 'You selected the correct pattern.');
+    if (selectedAnswer === 'Correct' && question.pattern === question.pattern) {
+      Alert.alert('Correct', 'You selected the correct answer.');
+    } else if (selectedAnswer === 'Incorrect' && question.pattern !== question.pattern) {
+      Alert.alert('Correct', 'You selected the correct answer.');
     } else {
-      Alert.alert('Incorrect', 'You selected the wrong pattern.');
+      Alert.alert('Incorrect', 'You selected the wrong answer.');
     }
   };
 
@@ -55,8 +69,7 @@ const QuestionScreen = () => {
   };
 
   const goToNextQuestion = () => {
-    setSelectedMainCategory(null);
-    setSelectedSubCategory(null);
+    setSelectedAnswer(null);
     setIsChecked(false);
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -64,6 +77,22 @@ const QuestionScreen = () => {
       Alert.alert("Quiz Completed", "You have completed the quiz.");
       setCurrentQuestionIndex(0); // Restart quiz or handle completion
     }
+  };
+
+  const getButtonStyle = (answer: string) => {
+    if (!isChecked) {
+      return selectedAnswer === answer ? [styles.answerButton, styles.selectedAnswerButton] : styles.answerButton;
+    }
+    if (answer === 'Correct' && question.pattern === question.pattern) {
+      return [styles.answerButton, styles.correctAnswerButton];
+    }
+    if (answer === 'Incorrect' && question.pattern !== question.pattern) {
+      return [styles.answerButton, styles.correctAnswerButton];
+    }
+    if (answer === selectedAnswer) {
+      return [styles.answerButton, styles.incorrectAnswerButton];
+    }
+    return styles.answerButton;
   };
 
   return (
@@ -81,38 +110,16 @@ const QuestionScreen = () => {
           <Text style={styles.questionTitle}>{question.question}</Text>
         </View>
         <Text style={styles.category}>{question.category}</Text>
+        <Text style={styles.pattern}>{question.pattern}</Text>
       </View>
-      <View style={styles.pickerContainer}>
-        <Text style={styles.pickerLabel}>Select the main category:</Text>
-        <Picker
-          selectedValue={selectedMainCategory}
-          onValueChange={(itemValue) => {
-            setSelectedMainCategory(itemValue);
-            setSelectedSubCategory(null); // Reset subcategory when main category changes
-          }}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select a main category" value={null} />
-          {Object.keys(mainCategories).map((category, index) => (
-            <Picker.Item key={index} label={category} value={category} />
-          ))}
-        </Picker>
+      <View style={styles.answerOptionsContainer}>
+        <TouchableOpacity style={getButtonStyle('Correct')} onPress={() => handleAnswerPress('Correct')}>
+          <Text style={styles.answerText}>Correct</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={getButtonStyle('Incorrect')} onPress={() => handleAnswerPress('Incorrect')}>
+          <Text style={styles.answerText}>Incorrect</Text>
+        </TouchableOpacity>
       </View>
-      {selectedMainCategory && (
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Select the subcategory:</Text>
-          <Picker
-            selectedValue={selectedSubCategory}
-            onValueChange={(itemValue) => setSelectedSubCategory(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select a subcategory" value={null} />
-            {mainCategories[selectedMainCategory].map((subcategory, index) => (
-              <Picker.Item key={index} label={subcategory} value={subcategory} />
-            ))}
-          </Picker>
-        </View>
-      )}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.checkButton} onPress={handleCheckPress}>
           <Text style={styles.checkText}>Check</Text>
@@ -183,20 +190,36 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  pickerContainer: {
-    marginTop: 16,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    padding: 16,
-  },
-  pickerLabel: {
+  pattern: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 8,
+    textAlign: 'center',
+    marginBottom: 16,
   },
-  picker: {
-    height: 50,
-    width: '100%',
+  answerOptionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  answerButton: {
+    flex: 1,
+    backgroundColor: '#e0e0e0',
+    padding: 12,
+    marginHorizontal: 4,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  selectedAnswerButton: {
+    backgroundColor: '#ffeb3b',
+  },
+  correctAnswerButton: {
+    backgroundColor: '#4CAF50',
+  },
+  incorrectAnswerButton: {
+    backgroundColor: '#f44336',
+  },
+  answerText: {
+    fontSize: 16,
   },
   buttonContainer: {
     flexDirection: 'row',

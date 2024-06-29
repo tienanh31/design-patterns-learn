@@ -19,8 +19,108 @@ const quizData: QuizQuestion[] = [
     answers: ["Adapter", "Builder", "Factory Method", "Bridge"],
     correctAnswer: "Builder"
   },
-  // Add more questions as needed
+  {
+    question: "Which design pattern defines an interface for creating an object but lets subclasses alter the type of objects that will be created?",
+    answers: ["Decorator", "Adapter", "Factory Method", "Prototype"],
+    correctAnswer: "Factory Method"
+  },
+  {
+    question: "Which design pattern specifies the kinds of objects to create using a prototypical instance and creates new objects by copying this prototype?",
+    answers: ["Composite", "Prototype", "Singleton", "Chain of Responsibility"],
+    correctAnswer: "Prototype"
+  },
+  {
+    question: "Which design pattern ensures a class has only one instance and provides a global point of access to it?",
+    answers: ["Singleton", "Facade", "Flyweight", "Proxy"],
+    correctAnswer: "Singleton"
+  },
+  {
+    question: "Which design pattern allows an object to alter its behavior when its internal state changes?",
+    answers: ["State", "Strategy", "Observer", "Command"],
+    correctAnswer: "State"
+  },
+  {
+    question: "Which design pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable?",
+    answers: ["Strategy", "Template Method", "Visitor", "Observer"],
+    correctAnswer: "Strategy"
+  },
+  {
+    question: "Which design pattern attaches additional responsibilities to an object dynamically?",
+    answers: ["Decorator", "Adapter", "Composite", "Facade"],
+    correctAnswer: "Decorator"
+  },
+  {
+    question: "Which design pattern provides a unified interface to a set of interfaces in a subsystem?",
+    answers: ["Facade", "Flyweight", "Proxy", "Bridge"],
+    correctAnswer: "Facade"
+  },
+  {
+    question: "Which design pattern uses sharing to support large numbers of fine-grained objects efficiently?",
+    answers: ["Flyweight", "Proxy", "Decorator", "Adapter"],
+    correctAnswer: "Flyweight"
+  },
+  {
+    question: "Which design pattern provides a surrogate or placeholder for another object to control access to it?",
+    answers: ["Proxy", "Adapter", "Decorator", "Facade"],
+    correctAnswer: "Proxy"
+  },
+  {
+    question: "Which design pattern converts the interface of a class into another interface clients expect?",
+    answers: ["Adapter", "Bridge", "Decorator", "Facade"],
+    correctAnswer: "Adapter"
+  },
+  {
+    question: "Which design pattern decouples an abstraction from its implementation so that the two can vary independently?",
+    answers: ["Bridge", "Adapter", "Composite", "Decorator"],
+    correctAnswer: "Bridge"
+  },
+  {
+    question: "Which design pattern composes objects into tree structures to represent part-whole hierarchies?",
+    answers: ["Composite", "Decorator", "Flyweight", "Facade"],
+    correctAnswer: "Composite"
+  },
+  {
+    question: "Which design pattern defines the skeleton of an algorithm in an operation, deferring some steps to subclasses?",
+    answers: ["Template Method", "Strategy", "Command", "Observer"],
+    correctAnswer: "Template Method"
+  },
+  {
+    question: "Which design pattern lets an object notify other objects of changes in its state?",
+    answers: ["Observer", "Mediator", "Chain of Responsibility", "Command"],
+    correctAnswer: "Observer"
+  },
+  {
+    question: "Which design pattern encapsulates a request as an object, thereby allowing for parameterization of clients with queues, requests, and operations?",
+    answers: ["Command", "Memento", "State", "Strategy"],
+    correctAnswer: "Command"
+  },
+  {
+    question: "Which design pattern captures and restores an object's internal state?",
+    answers: ["Memento", "Command", "Observer", "State"],
+    correctAnswer: "Memento"
+  },
+  {
+    question: "Which design pattern provides a way to access the elements of an aggregate object sequentially without exposing its underlying representation?",
+    answers: ["Iterator", "Visitor", "Strategy", "Mediator"],
+    correctAnswer: "Iterator"
+  },
+  {
+    question: "Which design pattern defines an object that encapsulates how a set of objects interact?",
+    answers: ["Mediator", "Observer", "Command", "Strategy"],
+    correctAnswer: "Mediator"
+  },
+  {
+    question: "Which design pattern represents an operation to be performed on the elements of an object structure?",
+    answers: ["Visitor", "Iterator", "Composite", "Interpreter"],
+    correctAnswer: "Visitor"
+  },
+  {
+    question: "Which design pattern interprets a given context?",
+    answers: ["Interpreter", "Visitor", "State", "Strategy"],
+    correctAnswer: "Interpreter"
+  }
 ];
+
 
 const QuizzScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -62,7 +162,7 @@ const QuizzScreen: React.FC = () => {
     } else {
       Alert.alert("Quiz Completed", `You have completed the quiz. Correct Answers: ${correctCount}`);
       setCurrentQuestionIndex(0); // Restart quiz or handle completion
-      setCorrectCount(0); // Reset correct count for the next quiz
+      // setCorrectCount(0); // Do not reset correct count to maintain correct answers count
     }
   };
 
@@ -139,8 +239,6 @@ const styles = StyleSheet.create({
     left: 16,
     top: '50%',
     transform: [{ translateY: -12 }], // Adjust this value to vertically center the button
-    marginTop: 25,
-
   },
   backButtonText: {
     fontSize: 24,
@@ -151,8 +249,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     flex: 1,
-    marginTop: 25,
-
   },
   questionContainer: {
     padding: 16,
