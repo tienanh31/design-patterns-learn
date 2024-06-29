@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 interface Question {
   question: string;
@@ -37,9 +38,12 @@ const questions: Question[] = [
 ];
 
 const QuestionScreen = () => {
+  const navigation = useNavigation();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [correctCount, setCorrectCount] = useState<number>(0);
+  const [hasChecked, setHasChecked] = useState<boolean>(false);
 
   const question = questions[currentQuestionIndex];
 
@@ -54,7 +58,9 @@ const QuestionScreen = () => {
       return;
     }
     setIsChecked(true);
+    setHasChecked(true); // Mark this question as checked
     if (selectedAnswer === 'Correct' && question.pattern === question.pattern) {
+      setCorrectCount(correctCount + 1);
       Alert.alert('Correct', 'You selected the correct answer.');
     } else if (selectedAnswer === 'Incorrect' && question.pattern !== question.pattern) {
       Alert.alert('Correct', 'You selected the correct answer.');
@@ -71,11 +77,13 @@ const QuestionScreen = () => {
   const goToNextQuestion = () => {
     setSelectedAnswer(null);
     setIsChecked(false);
+    setHasChecked(false); // Reset the check status for the next question
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      Alert.alert("Quiz Completed", "You have completed the quiz.");
+      Alert.alert("Quiz Completed", `You have completed the quiz. Correct Answers: ${correctCount}`);
       setCurrentQuestionIndex(0); // Restart quiz or handle completion
+      // setCorrectCount(0); // Do not reset correct count to maintain correct answers count
     }
   };
 
@@ -98,14 +106,14 @@ const QuestionScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>&lt;</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Тест: {question.category}</Text>
       </View>
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>Question {currentQuestionIndex + 1} of {questions.length}</Text>
-        <Text style={styles.score}>0</Text>
+        <Text style={styles.score}>Correct: {correctCount}</Text>
         <View style={styles.questionCard}>
           <Text style={styles.questionTitle}>{question.question}</Text>
         </View>
@@ -121,7 +129,7 @@ const QuestionScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.checkButton} onPress={handleCheckPress}>
+        <TouchableOpacity style={[styles.checkButton, hasChecked && styles.disabledButton]} onPress={handleCheckPress} disabled={hasChecked}>
           <Text style={styles.checkText}>Check</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.skipButton} onPress={handleSkipPress}>
@@ -260,6 +268,9 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  disabledButton: {
+    backgroundColor: '#9E9E9E',
   },
 });
 

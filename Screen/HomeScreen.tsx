@@ -6,7 +6,7 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
   type PatternCategory = 'all' | 'creational' | 'structural' | 'behavioral';
 
   const designPatterns = [
-    { id: 1, preTitle:'Creational Patterns', title: 'Abstract factory', image: require('../assets/images/camel.png'), imageDetail: require('../assets/images/abstract-factory.png'), 
+    { id: 1, preTitle:'Creational Patterns', title: 'Abstract factory', image: require('../assets/images/camel.png'), imageDetail: require('../assets/images/abstract-factory.webp'), 
     description: 'A design pattern that provides an interface for creating interdependent objects or interconnected families without specifying their specific classes. The template is implemented by creating an abstract class, which is an interface for creating system components. Then classes are written that implement this interface.', 
     proscons: 'Pros: Reusability, Flexibility, Separation of Concerns.\nCons: Complexity, Can Lead to Overengineering.', 
     task: 'Implement the Abstract Factory pattern by creating interfaces for different types of coffee and their recipes. Create classes that implement these interfaces to provide specific types of coffee.',
