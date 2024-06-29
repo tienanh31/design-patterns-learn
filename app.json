@@ -12,7 +12,13 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourapp.identifier",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We use your location to send you notifications",
+        "NSLocationAlwaysUsageDescription": "We use your location to send you notifications",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We use your location to send you notifications"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,6 +28,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4d4febaf-9a9e-4dac-89c3-16f2b6089f20"
+      }
     }
   }
 }
