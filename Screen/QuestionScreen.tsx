@@ -109,7 +109,7 @@ const QuestionScreen = () => {
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>&lt;</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Тест: {question.category}</Text>
+        <Text style={styles.title}>Тest: {question.category}</Text>
       </View>
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>Question {currentQuestionIndex + 1} of {questions.length}</Text>
@@ -169,6 +169,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    alignItems: 'center',
+    marginLeft: 50,
+
+
   },
   questionContainer: {
     padding: 16,

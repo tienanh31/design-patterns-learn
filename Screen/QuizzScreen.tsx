@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { doc, getDoc,setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 interface QuizQuestion {
   question: string;
   answers: string[];
@@ -121,14 +122,90 @@ const quizData: QuizQuestion[] = [
   }
 ];
 
-
 const QuizzScreen: React.FC = () => {
-  const navigation = useNavigation();
 
+  const navigation = useNavigation();
+  const fetchQuizData = async () => {
+    try {
+      const docRef = doc(db, "quiz", "9s9Y3n6aDHN9vSwLy8ls"); // Adjust collection and document ID as needed
+      const docSnap = await getDoc(docRef);
+  
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+  
+        if (data?.questions && Array.isArray(data.questions)) {
+          quizData.push(
+            ...data.questions.map((q: any) => ({
+              question: q.question,
+              answers: q.answers,
+              correctAnswer: q.correctAnswer,
+            }))
+          );
+        }
+      } else {
+        console.log("No such document!");
+      }
+    } catch (error) {
+      console.error("Error fetching document:", error);
+    }
+  };
+  
+  // Fetch data and log the quizData
+  fetchQuizData().then(() => {
+    console.log("Quiz Data:", quizData);
+  });
+const fetchQuizQuestions = async (): Promise<QuizQuestion[]> => {
+  try {
+    // Reference to the document
+    const docRef = doc(db, "quizzes", "quiz1"); // Adjust collection and document ID as needed
+
+    // Fetch the document
+    const docSnap = await getDoc(docRef);
+
+    // Initialize an array to store the quiz questions
+    let quizQuestions: QuizQuestion[] = [];
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      // Assuming the document contains an array of questions
+      if (data?.questions && Array.isArray(data.questions)) {
+        quizQuestions = data.questions.map((q: any) => ({
+          question: q.question,
+          answers: q.answers,
+          correctAnswer: q.correctAnswer
+        }));
+      }
+    } else {
+      console.log("No such document!");
+    }
+
+    return quizQuestions;
+  } catch (error) {
+    console.error("Error fetching document:", error);
+    return [];
+  }
+};
+
+// Example usage
+fetchQuizQuestions().then((quizQuestions) => {
+  console.log("Quiz Questions:", quizQuestions);
+});
+  useEffect(() => {
+    const writeQuizData = async () => {
+      await setDoc(doc(db, "Quiz", "1"), {
+        question: "Which design pattern specifies the kinds of objects to create using a prototypical instance and creates new objects by copying this prototype?",
+    answers: ["Composite", "Prototype", "Singleton", "Chain of Responsibility"],
+    correctAnswer: "Prototype"
+      });
+    }
+        writeQuizData();
+  }, []);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [correctCount, setCorrectCount] = useState<number>(0);
+  const [checkDisabled, setCheckDisabled] = useState<boolean>(false);
 
   const question = quizData[currentQuestionIndex];
   const correctAnswer = question.correctAnswer;
@@ -136,6 +213,7 @@ const QuizzScreen: React.FC = () => {
   const handleOptionPress = (option: string) => {
     setSelectedOption(option);
     setIsChecked(false); // Reset check state if the user changes their selection
+    setCheckDisabled(false); // Re-enable the check button if an option is selected
   };
 
   const handleCheckPress = () => {
@@ -144,6 +222,7 @@ const QuizzScreen: React.FC = () => {
       return;
     }
     setIsChecked(true);
+    setCheckDisabled(true); // Disable the check button after it is clicked
     if (selectedOption === correctAnswer) {
       setCorrectCount(correctCount + 1);
     }
@@ -157,6 +236,7 @@ const QuizzScreen: React.FC = () => {
   const goToNextQuestion = () => {
     setSelectedOption(null);
     setIsChecked(false);
+    setCheckDisabled(false); // Re-enable the check button for the next question
     if (currentQuestionIndex < quizData.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
@@ -181,11 +261,13 @@ const QuizzScreen: React.FC = () => {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>&lt;</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Quiz: pros & cons</Text>
+        <Text style={styles.title}>Тest: Multiple-choice </Text>
       </View>
       <View style={styles.questionContainer}>
-        <Text style={styles.questionText}>Question {currentQuestionIndex + 1} of {quizData.length}</Text>
-        <Text style={styles.correctText}>Correct: {correctCount}</Text>
+        <View style={styles.questionHeader}>
+          <Text style={styles.questionText}>Question {currentQuestionIndex + 1} of {quizData.length}</Text>
+          <Text style={styles.correctText}>Correct: {correctCount}</Text>
+        </View>
         <View style={styles.questionCard}>
           <Text style={styles.questionTitle}>{question.question}</Text>
         </View>
@@ -203,7 +285,11 @@ const QuizzScreen: React.FC = () => {
           ))}
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.checkButton} onPress={handleCheckPress}>
+          <TouchableOpacity
+            style={[styles.checkButton, checkDisabled && styles.disabledButton]}
+            onPress={handleCheckPress}
+            disabled={checkDisabled}
+          >
             <Text style={styles.checkText}>Check</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.skipButton} onPress={handleSkipPress}>
@@ -223,6 +309,7 @@ const QuizzScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     backgroundColor: '#fff',
   },
   header: {
@@ -232,13 +319,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    justifyContent: 'center',
   },
   backButton: {
-    position: 'absolute',
-    left: 16,
-    top: '50%',
-    transform: [{ translateY: -12 }], // Adjust this value to vertically center the button
+    marginRight: 16,
   },
   backButtonText: {
     fontSize: 24,
@@ -247,11 +330,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
-    flex: 1,
+    alignItems: 'center',
+    marginLeft: 55,
   },
   questionContainer: {
     padding: 16,
+  },
+  questionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Aligns children to be evenly spaced in the row
+    alignItems: 'center',
   },
   questionText: {
     fontSize: 16,
@@ -260,7 +348,6 @@ const styles = StyleSheet.create({
   correctText: {
     fontSize: 16,
     color: 'green',
-    textAlign: 'right',
   },
   questionCard: {
     padding: 16,
@@ -337,6 +424,9 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  disabledButton: {
+    backgroundColor: '#9E9E9E',
   },
 });
 

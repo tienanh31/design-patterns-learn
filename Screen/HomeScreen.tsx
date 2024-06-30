@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Image, StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const HomeScreen = ({ navigation }: { navigation: any }) => {
+const HomeScreen = () => {
   type PatternCategory = 'all' | 'creational' | 'structural' | 'behavioral';
+
 
   const designPatterns = [
     { id: 1, preTitle:'Creational Patterns', title: 'Abstract factory', image: require('../assets/images/camel.png'), imageDetail: require('../assets/images/abstract-factory.webp'), 
@@ -1144,6 +1145,8 @@ const HomeScreen = ({ navigation }: { navigation: any }) => {
     setDescriptionVisible(!descriptionVisible);
   };
 
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -1277,7 +1280,7 @@ const styles = StyleSheet.create({
   },
   footerButton: {
     alignItems: 'center',
-  }, 
+  },
   footerText: {
     fontSize: 16,
     color: '#666',

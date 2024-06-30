@@ -1,32 +1,48 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, Dimensions, ListRenderItem, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, Image, FlatList, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
+import { useStudiedPatterns } from '../StudiedPatternsContext';
 
 const { width } = Dimensions.get('window');
 
 const TestingScreen: React.FC = () => {
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const { studiedPatterns } = useStudiedPatterns();
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  const onViewRef = useRef(({ viewableItems }: { viewableItems: Array<{ index: number }> }) => {
+    setActiveIndex(viewableItems[0]?.index ?? 0);
+  });
+
+  const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
+
+  useEffect(() => {
+    if (isFocused) {
+      console.log('Studied Patterns Titles:', studiedPatterns.map((pattern: any) => pattern.title)); // Log titles of studied patterns
+    }
+  }, [isFocused, studiedPatterns]);
 
   const data = [
     {
       id: '1',
-      title: 'Теst 1',
-      description: 'Quizz',
-      image: 'https://via.placeholder.com/100',
+      title: 'Test 1',
+      description: 'Practice with Quiz Multiple-choice',
+      image: 'https://cdn-icons-png.flaticon.com/128/5182/5182538.png',
       screen: 'Quizz'
     },
     {
       id: '2',
-      title: 'Теst 2',
-      description: 'Name the pattern by its pros and cons',
-      image: 'https://via.placeholder.com/100',
+      title: 'Test 2',
+      description: 'Correct or Incorrect Quiz',
+      image: 'https://cdn-icons-png.flaticon.com/128/6193/6193558.png',
       screen: 'Question'
     },
     {
       id: '3',
-      title: 'Тест 3',
-      description: 'Name the pattern by its pros and cons',
-      image: 'https://via.placeholder.com/100',
+      title: 'Test 3',
+      description: 'Match the correct answers Quiz',
+      image: 'https://cdn-icons-png.flaticon.com/128/5691/5691719.png',
       screen: 'MatchQuestion'
     },
   ];
@@ -39,22 +55,29 @@ const TestingScreen: React.FC = () => {
     screen: string;
   }
 
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeTestIndex, setActiveTestIndex] = useState<number>(0);
 
-  const onViewRef = useRef(({ viewableItems }: { viewableItems: Array<{ index: number }> }) => {
-    setActiveIndex(viewableItems[0]?.index ?? 0);
+  const onTestViewRef = useRef(({ viewableItems }: { viewableItems: Array<{ index: number }> }) => {
+    setActiveTestIndex(viewableItems[0]?.index ?? 0);
   });
 
-  const viewConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
+  const viewTestConfigRef = React.useRef({ viewAreaCoveragePercentThreshold: 50 });
 
-  const renderItem: ListRenderItem<Item> = ({ item }) => (
+  const renderTestItem: ListRenderItem<Item> = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate(item.screen)}>
-      <View style={styles.testBox}>
+      <View style={styles.studyBox}>
         <Text style={styles.testTitle}>{item.title}</Text>
         <Text style={styles.testDescription}>{item.description}</Text>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image source={{ uri: item.image }} style={styles.image} onError={(error) => console.log('Error loading image:', error.nativeEvent.error)} />
       </View>
     </TouchableOpacity>
+  );
+
+  const renderStudiedItem = ({ item }: any) => (
+    <View style={styles.testBox}>
+      <Text style={styles.testTitle}>{item.title}</Text>
+      <Image source={ item.image } style={styles.image} onError={(error) => console.log('Error loading image:', error.nativeEvent.error)} />
+    </View>
   );
 
   return (
@@ -69,9 +92,10 @@ const TestingScreen: React.FC = () => {
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          onViewableItemsChanged={onViewRef.current}
-          viewabilityConfig={viewConfigRef.current}
+          renderItem={renderTestItem}
+          onViewableItemsChanged={onTestViewRef.current}
+          viewabilityConfig={viewTestConfigRef.current}
+          contentContainerStyle={styles.flatListContainer}
         />
         <View style={styles.indicatorContainer}>
           {data.map((_, index) => (
@@ -79,7 +103,7 @@ const TestingScreen: React.FC = () => {
               key={index}
               style={[
                 styles.indicator,
-                { opacity: index === activeIndex ? 1 : 0.3 },
+                { opacity: index === activeTestIndex ? 1 : 0.3 },
               ]}
             />
           ))}
@@ -98,26 +122,35 @@ const TestingScreen: React.FC = () => {
       <View style={styles.section}>
         <Text style={styles.subHeading}>Studied</Text>
         <View style={styles.studiedBox}>
-          <Text style={styles.studiedText}>The studied patterns will appear here</Text>
+          <FlatList
+            data={studiedPatterns}
+            horizontal
+            pagingEnabled
+            snapToAlignment="center"
+            snapToInterval={width * 0.6} // Adjust to the desired width
+            decelerationRate="fast"
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderStudiedItem}
+            keyExtractor={(item) => item.id.toString()}
+            onViewableItemsChanged={onViewRef.current}
+            viewabilityConfig={viewConfigRef.current}
+            contentContainerStyle={styles.flatListContainer}
+          />
+          <View style={styles.indicatorContainer}>
+            {studiedPatterns.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.indicator,
+                  { opacity: index === activeIndex ? 1 : 0.3 },
+                ]}
+              />
+            ))}
+          </View>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.subHeading}>Not studied</Text>
-        <View style={styles.notStudiedBox}>
-          <View style={styles.patternBox}>
-            <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.image} />
-            <Text style={styles.patternTitle}>Abstract factory</Text>
-          </View>
-          <View style={styles.patternBox}>
-            <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.image} />
-            <Text style={styles.patternTitle}>Builder</Text>
-          </View>
-          <View style={styles.patternBox}>
-            <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.image} />
-            <Text style={styles.patternTitle}>Factory method</Text>
-          </View>
-        </View>
       </View>
 
       <View style={styles.section}>
@@ -139,19 +172,12 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
-  time: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 8,
     textAlign: 'center',
     marginTop: 20,
-
-
   },
   subHeading: {
     fontSize: 18,
@@ -163,26 +189,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0F7FA',
     borderRadius: 8,
     alignItems: 'center',
-    width: width - 32, // To ensure full width of the screen
+    width: width * 0.6, // Adjust to the desired width
+    marginHorizontal: 8, // Adjust for spacing
+  },
+  flatListContainer: {
+    alignItems: 'center',
   },
   testTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
-    alignItems: 'center',
-
+    textAlign: 'center',
   },
   testDescription: {
     fontSize: 16,
     marginBottom: 8,
-    alignItems: 'center',
-
   },
   studyBox: {
     padding: 16,
     backgroundColor: '#E0F7FA',
     borderRadius: 8,
     alignItems: 'center',
+    width: width - 32, // Ensure consistent width
   },
   studyTitle: {
     fontSize: 18,
@@ -198,9 +226,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF9C4',
     borderRadius: 8,
     alignItems: 'center',
-  },
-  studiedText: {
-    fontSize: 16,
   },
   notStudiedBox: {
     flexDirection: 'row',
@@ -230,8 +255,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginBottom: 8,
-    alignItems: 'center',
-
   },
   indicatorContainer: {
     flexDirection: 'row',

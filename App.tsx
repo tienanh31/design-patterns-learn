@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, Image,ImageBackground, TouchableOpacity, Settin
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { TabBarIcon } from './Components/TabBarIcon';
+import { StudiedPatternsProvider } from './StudiedPatternsContext';
 
 import HomeScreen from './Screen/HomeScreen';
 import StartScreen from './Screen/StartScreen';
@@ -12,6 +14,8 @@ import QuestionScreen from './Screen/QuestionScreen';
 import MatchQuizzScreen from './Screen/MatchQuizzScreen';
 import GeminiChat from './Screen/GeminiChat';
 import TestingScreen from './Screen/TestingScreen';
+import SettingsScreen from './Screen/SettingScreen';
+import CopyrightScreen from './Screen/CopyRightScreen';
 const App = () => {
   const Stack = createStackNavigator();
   const Tab = createBottomTabNavigator();
@@ -20,20 +24,42 @@ const TabNavigator = () => {
   return (
     <Tab.Navigator screenOptions={{
       headerShown: false
+
     }}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Testing" component={TestingScreen} />
-      <Tab.Screen name="Gemini AI" component={GeminiChat} />
-      {/* <Tab.Screen name="Settings" component={Settings} /> */}
+      <Tab.Screen name="Home" component={HomeScreen} options={{
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+          ),
+        }} />
+      <Tab.Screen name="Testing" component={TestingScreen}  options={{
+          title: 'Testing',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          ),
+        }}/>
+      <Tab.Screen name="Gemini AI" component={GeminiChat} options={{
+          title: 'Gemini AI',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'rocket' : 'rocket-outline'} color={color} />
+          ),
+        }}/>
+      <Tab.Screen name="Settings" component={SettingsScreen}options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'settings' : 'settings-outline'} color={color} />
+          ),
+        }}/>
 
     </Tab.Navigator>
   );
 };
   return (
+    <StudiedPatternsProvider>
+
     <NavigationContainer>
     <Stack.Navigator initialRouteName="Start" screenOptions={{
-    headerShown: false
-  }}>
+    headerShown: false }}>
       <Stack.Screen name="Start" component={StartScreen} />
       <Stack.Screen name="Home" component={TabNavigator} />
       <Stack.Screen name="Detail" component={DetailPatternCategory} />
@@ -41,9 +67,12 @@ const TabNavigator = () => {
       <Stack.Screen name="Testing" component={TestingScreen} />
       <Stack.Screen name="Question" component={QuestionScreen} />
       <Stack.Screen name="MatchQuestion" component={MatchQuizzScreen} />
+      <Stack.Screen name="Setting" component={SettingsScreen} />
+      <Stack.Screen name="Copyright" component={CopyrightScreen} />
 
     </Stack.Navigator>
   </NavigationContainer>
+  </StudiedPatternsProvider>
   );
 };
 

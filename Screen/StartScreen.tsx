@@ -4,13 +4,13 @@ import { StyleSheet, Text, View,Image, ImageBackground, TouchableOpacity } from 
 const StartScreen = ({navigation}: {navigation: any}) => {
     return (
     <View style={styles.container}>
-      <ImageBackground source={require('../assets/images/start.jpeg')} style={styles.backgroundImage}>
+      <ImageBackground source={require('../assets/images/captain.jpg')} style={styles.backgroundImage}>
         <View style={styles.overlay}>
-        <Image source={require('../assets/images/favicon.png')} style={styles.logo} />
+        <Image source={require('../assets/images/rocket.gif')} style={styles.logo} />
           <Text style={styles.title}>Design Patterns</Text>
-          <Text style={styles.subtitle}>    Kết nối với tương lai</Text>
+          <Text style={styles.subtitle}>Basic of patterns</Text>
           <Text style={styles.description}>
-            Ứng dụng giúp tìm hiểu về Design Patterns cơ bản!
+            Applications for learning the basics of design patterns
           </Text>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Home')}>
             <Text style={styles.buttonText}>Get Started</Text>

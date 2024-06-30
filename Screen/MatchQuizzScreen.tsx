@@ -68,12 +68,14 @@ const MatchQuizzScreen = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [score, setScore] = useState<number>(0);
+  const [checkDisabled, setCheckDisabled] = useState<boolean>(false);
 
   const question = questions[currentQuestionIndex];
 
   const handleCheckPress = () => {
-    if (isChecked) return; // Prevent multiple checks
+    if (isChecked || checkDisabled) return; // Prevent multiple checks
     setIsChecked(true);
+    setCheckDisabled(true); // Disable the check button after it is clicked
     if (selectedCategory === question.category && selectedPattern === question.pattern) {
       Alert.alert('Correct', 'You selected the correct answer.');
       setScore(score + 1);
@@ -84,6 +86,7 @@ const MatchQuizzScreen = () => {
 
   const goToNextQuestion = () => {
     setIsChecked(false);
+    setCheckDisabled(false); // Re-enable the check button for the next question
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
@@ -104,6 +107,7 @@ const MatchQuizzScreen = () => {
           <Text style={styles.backButtonText}>&lt;</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Test: Match Answer</Text>
+        <View style={{ flex: 1 }} />
       </View>
       <View style={styles.questionContainer}>
         <View style={styles.questionHeader}>
@@ -115,7 +119,6 @@ const MatchQuizzScreen = () => {
         </View>
         <View style={styles.pickerContainer}>
           <View style={styles.pickerWrapper}>
-            <Text style={styles.label}>Design Pattern Category:</Text>
             <Picker
               selectedValue={selectedCategory}
               onValueChange={(value) => {
@@ -130,7 +133,6 @@ const MatchQuizzScreen = () => {
             </Picker>
           </View>
           <View style={styles.pickerWrapper}>
-            <Text style={styles.label}>Design Pattern:</Text>
             <Picker
               selectedValue={selectedPattern}
               onValueChange={(value) => setSelectedPattern(value)}
@@ -148,7 +150,11 @@ const MatchQuizzScreen = () => {
         <Text style={styles.pattern}>{selectedPattern}</Text>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.checkButton} onPress={handleCheckPress}>
+        <TouchableOpacity
+          style={[styles.checkButton, checkDisabled && styles.disabledButton]}
+          onPress={handleCheckPress}
+          disabled={checkDisabled}
+        >
           <Text style={styles.checkButtonText}>Check</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.skipButton} onPress={handleSkipPress}>
@@ -177,6 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    justifyContent: 'center', // Center align the content
   },
   backButton: {
     marginRight: 16,
@@ -188,7 +195,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    alignItems: 'center',
+    textAlign: 'center',
+    marginLeft: 63,
 
   },
   questionContainer: {
@@ -292,6 +300,9 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  disabledButton: {
+    backgroundColor: '#9E9E9E',
   },
 });
 

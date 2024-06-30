@@ -1,6 +1,6 @@
-// Import the functions you need from the SDKs you need
-import firebase from 'firebase/app';
-import 'firebase/firestore';    
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from "firebase/firestore";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -15,13 +15,9 @@ const firebaseConfig = {
   messagingSenderId: "1047813906503",
   appId: "1:1047813906503:web:3448d978623c13af00d162",
   measurementId: "G-9DW2R6NPWG"
-};
+};  
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  
-  const firestore = firebase.firestore();
-  
-  export { firestore };
+const app = initializeApp(firebaseConfig);
+ const db = getFirestore(app);
+ export { db };

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "test2",
-    "slug": "test2",
+    "slug": "1",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -33,6 +33,7 @@
       "eas": {
         "projectId": "4d4febaf-9a9e-4dac-89c3-16f2b6089f20"
       }
-    }
+    },
+    "owner": "tienanh31"
   }
 }
